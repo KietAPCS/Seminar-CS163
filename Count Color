@@ -1,0 +1,54 @@
+// Source: https://usaco.guide/general/io
+
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 2e5 + 100;
+vector <int> a[N];
+int n, color[N];
+int res[N];
+int trac[N]; 
+map <int,int> CountColor[N];
+
+
+int trace(int u){
+	if (u != trac[u]) return trac[u] = trace(trac[u]);
+	return u;
+}
+
+void join(int u, int v){
+	u = trace(u);
+	v = trace(v);
+
+	if (u == v) return ;
+
+	if (CountColor[u].size() < CountColor[v].size()) swap(u,v);
+
+	for (pair <int,int> x: CountColor[v])  CountColor[u][x.first] += x.second; 
+	trac[v] = u;
+}
+
+int main() {
+
+	int m;
+	cin >> n >> m;
+
+	for (int i = 1; i <= n ; i++){
+		cin >> color[i];
+		trac[i] = i;
+		CountColor[i][color[i]] = 1;
+	}
+
+	while (m--){
+		int id , u , v;
+		cin >> id >> u >> v;
+		if (id == 1){
+			join(u,v);
+		}
+		else {
+			int x = trace(u);
+			cout << CountColor[x][v] << "\n";
+		}
+	}
+
+	return 0;
+}
