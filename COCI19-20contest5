@@ -1,0 +1,140 @@
+#include <iostream>
+#include <string>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <vector>
+#include <set>
+#include <map>
+#include <deque>
+#include <stack>
+#include <queue>
+#include <algorithm>
+#include <cassert>
+#include <ctype.h>
+#include <math.h>
+#include <iomanip>
+#define int long long
+#define ii pair<int,int>
+#define fi first
+#define se second
+#define getbit(x,y) (((x)>>(y))&1)
+#define turnon(x,y) ((x)|(1<<y))
+#define turnof(x,y) ((x)^(1<<y))
+#define oo 1000000000000000000
+#define pb push_back
+#define all(x) x.begin(),x.end()
+#define con(mask) mask=(mask-1)&mask
+#define Unique(val) val.erase(unique(val.begin(),val.end()),val.end())
+
+const int mod=1e9+7;
+using namespace std;
+
+int n, m, res;
+int f[200005][20], cnt[200005];
+int hi[200005];
+
+struct nhan {
+    int toi, a, b;
+
+    nhan (int _toi, int _a, int _b) {
+        a = _a;
+        b = _b;
+        toi = _toi;
+    }
+};
+
+vector<nhan>e[200005];
+
+
+void dfs(int u, int p) {
+    for(int i = 0; i < e[u].size(); i++) {
+        int v = e[u][i].toi;
+
+        if(v == p) continue;
+
+        hi[v] = hi[u] + 1;
+        f[v][0] = u;
+
+        dfs(v, u);
+    }
+}
+
+int lca(int u, int v) {
+    if(hi[u] > hi[v]) swap(u, v);
+
+    for(int i = 19; i >= 0; i--) {
+        if(hi[f[v][i]] >= hi[u]) {
+            v = f[v][i];
+        }
+    }
+    if(u == v) return u;
+
+    for(int i = 19; i >= 0; i--) {
+        if(f[u][i] != f[v][i]) {
+            u = f[u][i];
+            v = f[v][i];
+        }
+    }
+    return f[u][0];
+}
+
+void Dfs(int u, int p) {
+    for(int i = 0; i < e[u].size(); i++) {
+        int v = e[u][i].toi;
+        int a = e[u][i].a;
+        int b = e[u][i].b;
+
+        if(v == p) continue;
+
+        Dfs(v, u);
+        res += min(b, cnt[v] * a);
+        cnt[u] += cnt[v];
+    }
+}
+
+signed main()
+{
+
+    ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+
+    cin >> n;
+
+    for(int i = 1; i < n; i++) {
+        int u, v, a, b;
+        cin >> u >> v >> a >> b;
+        e[u].pb(nhan(v, a, b));
+        e[v].pb(nhan(u, a, b));
+    }
+
+    hi[1] = 1;
+    dfs(1, 1);
+
+    for(int j = 1; j < 20; j++) {
+        for(int i = 1; i <= n; i++) {
+            if(f[i][j - 1]) {
+                f[i][j] = f[f[i][j - 1]][j - 1];
+            }
+        }
+    }
+
+    for(int i = 1; i < n; i++) {
+        int a = i, b = i + 1;
+        int cha = lca(a, b);
+        cnt[a]++;
+        cnt[b]++;
+        cnt[cha] -= 2;
+    }
+
+    Dfs(1, 1);
+
+
+    cout << res;
+    
+    
+
+}
+//      ProTeam
+//(¯`·.·´¯) (¯`·.·´¯)
+//`·.¸(¯`·.·´¯)¸ .·
+//×°× ` ·.¸.·´ ×°×
